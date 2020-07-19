@@ -2,6 +2,12 @@ import pygame as pg
 from sprites import *
 from settings import *
 
+# TODO:
+# 1. Rotate ball depending on the situation
+# 2. Add Net and Collision with new_shot
+# 3. Start and Over Screens
+# 4. Settings Screen
+
 
 class Game:
     def __init__(self):
@@ -42,7 +48,7 @@ class Game:
         self.screen.fill(WHITE)
         self.screen.blit(self.bkgrd, (0, 0))
         self.all_sprites.draw(self.screen)
-        pg.draw.line(self.screen, BLACK, self.ball.line[0], self.ball.line[1])
+        pg.draw.line(self.screen, RED, self.ball.line[0], self.ball.line[1])
         pg.display.flip()
 
     def show_start_screen(self):
