@@ -48,7 +48,7 @@ class Game:
         self.screen.fill(WHITE)
         self.screen.blit(self.bkgrd, (0, 0))
         self.all_sprites.draw(self.screen)
-        pg.draw.line(self.screen, RED, self.ball.line[0], self.ball.line[1])
+        pg.draw.line(self.screen, WHITE, self.ball.line[0], self.ball.line[1])
         pg.display.flip()
 
     def show_start_screen(self):
@@ -58,10 +58,15 @@ class Game:
         pass
 
 
-game = Game()
-game.show_start_screen()
-while game.running:
-    game.new_game()
-    game.show_over_screen()
+def main():
+    global game
+    game = Game()
+    game.show_start_screen()
+    while game.running:
+        game.new_game()
+        game.show_over_screen()
+    pg.quit()
 
-pg.quit()
+
+if __name__ == '__main__':
+    main()

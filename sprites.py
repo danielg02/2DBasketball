@@ -9,23 +9,24 @@ class Ball(pg.sprite.Sprite):
         self.game = game
         self.image = pg.image.load('ball.png')
         self.rect = self.image.get_rect()
-        self.rect.midbottom = (100, HEIGHT - 40)
+        self.rect.midbottom = (100, HEIGHT - GROUND_HEIGHT)
         self.shoot = False
         self.bounds_check = True
+        self.attempts = 0
 
     def update(self):
         pos = pg.mouse.get_pos()
         self.line = [(self.rect.midtop[0], self.rect.midtop[1]), pos]
         if not self.bounds_check:
-            if self.rect.bottom >= HEIGHT - 40 and self.rect.left != 0 and self.rect.right != WIDTH:
-                self.rect.bottom = HEIGHT - 40
+            if self.rect.bottom >= HEIGHT - GROUND_HEIGHT and self.rect.left != 0 and self.rect.right != WIDTH:
+                self.rect.bottom = HEIGHT - GROUND_HEIGHT
                 self.bounds_check = True
                 self.shoot = False
                 self.bounce_direction = 0
             else:
                 self.wall_bounce()
         elif self.shoot:
-            if self.rect.bottom - 1 < HEIGHT - 40:
+            if self.rect.bottom - 1 < HEIGHT - GROUND_HEIGHT:
                 if not self.wall_check():
                     self.time += TIME_CHANGE
                     po = self.ballPath(self.startX, self.startY, self.power, self.angle, self.time)
@@ -33,13 +34,14 @@ class Ball(pg.sprite.Sprite):
                     self.rect.bottom = po[1]
             else:
                 self.shoot = False
-                self.rect.bottom = HEIGHT - 40
+                self.rect.bottom = HEIGHT - GROUND_HEIGHT
         elif not self.shoot and self.bounds_check:
             if self.rect.right > WIDTH:
                 self.rect.right = WIDTH - 1
 
     def new_shot(self):
         if not self.shoot:
+            self.attempts += 1
             self.shoot = True
             self.time = 0
             self.power = math.sqrt(pow(self.line[1][1]-self.line[0][1], 2) +
@@ -52,12 +54,12 @@ class Ball(pg.sprite.Sprite):
         if self.rect.left <= 0:
             self.bounce_direction = 1
             self.bounds_check = False
-            self.reset_var_bounce(290, self.rect.left)
+            self.reset_var_bounce(320, self.rect.left)
             return True
         elif self.rect.right >= WIDTH:
             self.bounce_direction = -1
             self.bounds_check = False
-            self.reset_var_bounce(250, self.rect.right)
+            self.reset_var_bounce(220, self.rect.right)
             return True
         return False
 
