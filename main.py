@@ -1,12 +1,15 @@
 import pygame as pg
-from sprites import *
+from ball import Ball
+from net import Net
 from settings import *
 
 # TODO:
 # 1. Rotate ball depending on the situation
-# 2. Add Net and Collision with new_shot
+# 2. Add Net Collision with new_shot
 # 3. Start and Over Screens
 # 4. Settings Screen
+# 5. Moving Background and Obstacles
+# 6. Multiple Levels
 
 
 class Game:
@@ -14,15 +17,17 @@ class Game:
         pg.init()
         pg.mixer.init()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
-        self.bkgrd = pg.image.load("bkgd.jpg").convert()
+        self.bkgrd = pg.image.load("Images/bkgd.jpg").convert()
         pg.display.set_caption(TITLE)
         self.clock = pg.time.Clock()
         self.running = True
+        self.score = 0
 
     def new_game(self):
         self.all_sprites = pg.sprite.Group()
+        self.net = Net(game)
         self.ball = Ball(game)
-        self.all_sprites.add(self.ball)
+        self.all_sprites.add(self.ball, self.net)
         self.run()
 
     def run(self):
@@ -48,7 +53,7 @@ class Game:
         self.screen.fill(WHITE)
         self.screen.blit(self.bkgrd, (0, 0))
         self.all_sprites.draw(self.screen)
-        pg.draw.line(self.screen, WHITE, self.ball.line[0], self.ball.line[1])
+        pg.draw.line(self.screen, LINE_COLOUR, self.ball.line[0], self.ball.line[1])
         pg.display.flip()
 
     def show_start_screen(self):

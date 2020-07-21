@@ -7,11 +7,14 @@ class Ball(pg.sprite.Sprite):
     def __init__(self, game):
         super().__init__()
         self.game = game
-        self.image = pg.image.load('ball.png')
+        self.net = self.game.net.rect
+        self.center_hoop = self.game.net.center_hoop
+        self.image = pg.image.load('Images/ball.png')
         self.rect = self.image.get_rect()
         self.rect.midbottom = (100, HEIGHT - GROUND_HEIGHT)
         self.shoot = False
         self.bounds_check = True
+        self.basket = False
         self.attempts = 0
 
     def update(self):
@@ -19,15 +22,22 @@ class Ball(pg.sprite.Sprite):
         self.line = [(self.rect.midtop[0], self.rect.midtop[1]), pos]
         if not self.bounds_check:
             if self.rect.bottom >= HEIGHT - GROUND_HEIGHT and self.rect.left != 0 and self.rect.right != WIDTH:
+                self.check_basket()
                 self.rect.bottom = HEIGHT - GROUND_HEIGHT
                 self.bounds_check = True
                 self.shoot = False
                 self.bounce_direction = 0
             else:
                 self.wall_bounce()
+        elif self.basket:
+            if self.rect.bottom == HEIGHT - GROUND_HEIGHT:
+                self.basket = False
+            self.rect.centerx = self.center_hoop
+            self.rect.bottom += 1
         elif self.shoot:
             if self.rect.bottom - 1 < HEIGHT - GROUND_HEIGHT:
                 if not self.wall_check():
+                    self.check_basket()
                     self.time += TIME_CHANGE
                     po = self.ballPath(self.startX, self.startY, self.power, self.angle, self.time)
                     self.rect.centerx = po[0]
@@ -63,15 +73,19 @@ class Ball(pg.sprite.Sprite):
             return True
         return False
 
-    def reset_var_bounce(self, degrees, startX):
+    def reset_var_bounce(self, degrees, startX, at_basket=False):
         self.time = 0
         self.power /= 2
-        self.angle = math.radians(degrees)
         self.startX = startX
         self.startY = self.rect.bottom
+        if at_basket:
+            self.angle = math.radians(270)
+        else:
+            self.angle = math.radians(degrees)
 
     def wall_bounce(self):
         # self.game.clock.tick(1000)
+        self.check_basket()
         if self.bounce_direction == 1:
             self.time += TIME_CHANGE
             po = self.ballPath(self.startX, self.startY, self.power, self.angle, self.time)
@@ -99,3 +113,16 @@ class Ball(pg.sprite.Sprite):
         newX = round(distX + startx)
         newY = round(starty - distY)
         return (newX, newY)
+
+    def check_basket(self):
+        po = self.ballPath(self.startX, self.startY, self.power,
+                           self.angle, self.time + TIME_CHANGE)
+        if po[1] == self.net.top + 10:
+            if self.rect.centerx < self.net.right and self.rect.centerx > self.net.left:
+                # Ball must go straight down after scoring
+                self.game.score += 1
+                print(self.game.score)
+                self.basket = True
+                self.bounds_check = True
+                return True
+        return False
