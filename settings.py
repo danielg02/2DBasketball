@@ -1,6 +1,6 @@
 
 # DISPLAY SETTINGS
-TITLE = "Basketball"
+TITLE = "2D Basketball"
 WIDTH = 800
 HEIGHT = 600
 

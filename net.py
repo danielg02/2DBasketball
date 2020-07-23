@@ -12,4 +12,3 @@ class Net(pg.sprite.Sprite):
         self.rect.right = WIDTH
         self.rect.bottom = HEIGHT - 300
         self.center_hoop = self.rect.right - 55
-        # Add scores and attemps to dict to stop repeated scoring

@@ -2,14 +2,14 @@ import pygame as pg
 from ball import Ball
 from net import Net
 from settings import *
+import start
 
 # TODO:
-# 1. Rotate ball depending on the situation
-# 2. Add Net Collision with new_shot
-# 3. Start and Over Screens
-# 4. Settings Screen
-# 5. Moving Background and Obstacles
-# 6. Multiple Levels
+# Start Screen
+# Moving Background and Obst=acles
+# Settings screen
+# Game Over Screen
+# Multiple Levels
 
 
 class Game:
@@ -57,7 +57,7 @@ class Game:
         pg.display.flip()
 
     def show_start_screen(self):
-        pass
+        start.run()
 
     def show_over_screen(self):
         pass

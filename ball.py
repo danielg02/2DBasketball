@@ -84,7 +84,6 @@ class Ball(pg.sprite.Sprite):
             self.angle = math.radians(degrees)
 
     def wall_bounce(self):
-        # self.game.clock.tick(1000)
         self.check_basket()
         if self.bounce_direction == 1:
             self.time += TIME_CHANGE
@@ -102,6 +101,17 @@ class Ball(pg.sprite.Sprite):
         delta_y = self.line[0][1] - self.line[1][1]
         return math.atan2(delta_y, delta_x)
 
+    def check_basket(self):
+        # Check future position
+        po = self.ballPath(self.startX, self.startY, self.power,
+                           self.angle, self.time + TIME_CHANGE)
+        if po[1] == self.net.top + 10:
+            if self.rect.centerx < self.net.right - 20 and self.rect.centerx > self.net.left + 10:
+                # Ball must go straight down after scoring
+                self.game.score += 1
+                self.basket = True
+                self.bounds_check = True
+
     @staticmethod
     def ballPath(startx, starty, power, angle, time):
         velx = math.cos(angle) * power
@@ -113,16 +123,3 @@ class Ball(pg.sprite.Sprite):
         newX = round(distX + startx)
         newY = round(starty - distY)
         return (newX, newY)
-
-    def check_basket(self):
-        po = self.ballPath(self.startX, self.startY, self.power,
-                           self.angle, self.time + TIME_CHANGE)
-        if po[1] == self.net.top + 10:
-            if self.rect.centerx < self.net.right and self.rect.centerx > self.net.left:
-                # Ball must go straight down after scoring
-                self.game.score += 1
-                print(self.game.score)
-                self.basket = True
-                self.bounds_check = True
-                return True
-        return False
