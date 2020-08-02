@@ -5,9 +5,8 @@ from settings import *
 import start
 
 # TODO:
-# Start Screen
-# Moving Background and Obst=acles
 # Settings screen
+# Moving Background and Obstacles
 # Game Over Screen
 # Multiple Levels
 

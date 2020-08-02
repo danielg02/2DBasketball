@@ -1,7 +1,6 @@
 import pygame as pg
 from settings import *
 
-
 pg.init()
 pg.mixer.init()
 pg.font.init()
@@ -29,8 +28,8 @@ def run():
         screen.blit(bkgrd, (0, 0))
         screen.blit(start, (515, 150))
         screen.blit(settings, (WIDTH - settings.get_width() - 10, 10))
-        screen.blit(name_1, (40, 380))
-        screen.blit(name_2, (40, 380 + name_2.get_height()))
+        screen.blit(name_1, (40, HEIGHT - 40 - name_1.get_height() - name_1.get_height()))
+        screen.blit(name_2, (40, HEIGHT - 40 - name_2.get_height()))
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
