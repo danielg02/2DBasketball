@@ -15,7 +15,7 @@ class Ball(pg.sprite.Sprite):
         self.shoot = False
         self.bounds_check = True
         self.basket = False
-        self.attempts = 0
+        self.scored = False
 
     def update(self):
         pos = pg.mouse.get_pos()
@@ -27,31 +27,40 @@ class Ball(pg.sprite.Sprite):
                 self.bounds_check = True
                 self.shoot = False
                 self.bounce_direction = 0
+                self.game.attempts += 1
             else:
                 self.wall_bounce()
         elif self.basket:
-            if self.rect.bottom == HEIGHT - GROUND_HEIGHT:
+            if self.rect.bottom >= HEIGHT - GROUND_HEIGHT:
                 self.basket = False
+                self.scored = True
+                self.rect.bottom = HEIGHT - GROUND_HEIGHT
             self.rect.centerx = self.center_hoop
-            self.rect.bottom += 1
+            self.rect.bottom += 3
         elif self.shoot:
             if self.rect.bottom - 1 < HEIGHT - GROUND_HEIGHT:
                 if not self.wall_check():
                     self.check_basket()
                     self.time += TIME_CHANGE
-                    po = self.ballPath(self.startX, self.startY, self.power, self.angle, self.time)
+                    po = self.ballPath(self.startX, self.startY, self.power,
+                                       self.angle, self.time, GRAVITY)
                     self.rect.centerx = po[0]
                     self.rect.bottom = po[1]
             else:
                 self.shoot = False
                 self.rect.bottom = HEIGHT - GROUND_HEIGHT
+                self.game.attempts += 1
         elif not self.shoot and self.bounds_check:
             if self.rect.right > WIDTH:
                 self.rect.right = WIDTH - 1
+            elif self.scored:
+                self.rect.left = 100
+                height = self.game.net.change()
+                self.game.obstacle.change(height)
+                self.scored = False
 
     def new_shot(self):
         if not self.shoot:
-            self.attempts += 1
             self.shoot = True
             self.time = 0
             self.power = math.sqrt(pow(self.line[1][1]-self.line[0][1], 2) +
@@ -87,12 +96,14 @@ class Ball(pg.sprite.Sprite):
         self.check_basket()
         if self.bounce_direction == 1:
             self.time += TIME_CHANGE
-            po = self.ballPath(self.startX, self.startY, self.power, self.angle, self.time)
+            po = self.ballPath(self.startX, self.startY, self.power,
+                               self.angle, self.time, GRAVITY)
             self.rect.left = po[0]
             self.rect.bottom = po[1]
         elif self.bounce_direction == -1:
             self.time += TIME_CHANGE
-            po = self.ballPath(self.startX, self.startY, self.power, self.angle, self.time)
+            po = self.ballPath(self.startX, self.startY, self.power,
+                               self.angle, self.time, GRAVITY)
             self.rect.right = po[0]
             self.rect.bottom = po[1]
 
@@ -104,21 +115,21 @@ class Ball(pg.sprite.Sprite):
     def check_basket(self):
         # Check future position
         po = self.ballPath(self.startX, self.startY, self.power,
-                           self.angle, self.time + TIME_CHANGE)
+                           self.angle, self.time + TIME_CHANGE, GRAVITY)
         if po[1] == self.net.top + 10:
             if self.rect.centerx < self.net.right - 20 and self.rect.centerx > self.net.left + 10:
                 # Ball must go straight down after scoring
-                self.game.score += 1
+                self.game.score1 += 1
                 self.basket = True
                 self.bounds_check = True
 
     @staticmethod
-    def ballPath(startx, starty, power, angle, time):
+    def ballPath(startx, starty, power, angle, time, gravity):
         velx = math.cos(angle) * power
         vely = math.sin(angle) * power
 
         distX = velx * time
-        distY = (vely * time) + ((-GRAVITY * pow(time, 2))/2)
+        distY = (vely * time) + ((-gravity * pow(time, 2))/2)
 
         newX = round(distX + startx)
         newY = round(starty - distY)

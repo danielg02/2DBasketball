@@ -5,13 +5,11 @@ from settings import *
 from start import Start
 from obstacles import Obstacle
 from network import Network
-from wait import Wait
 
 # TODO:
-# Obstacle Collision
+# Random Generating Obstacle OR Random Net Height
 # Game Over Screen
-# Reset game/server
-# Wait for game
+# Create multiplayer
 
 
 class Game:
@@ -55,13 +53,11 @@ class Game:
                 self.running = False
             elif event.type == pg.MOUSEBUTTONUP:
                 self.ball.new_shot()
-        self.score2 = str(self.network.send(str(self.score1)))
 
     def draw(self):
         font = pg.font.Font('Fonts/212 Sports.otf', 30)
-        score1 = font.render('Score: {}'.format(self.score1), False, BLACK)
-        score2 = font.render('Score: {}'.format(self.score2), False, BLACK)
-        # attempts = font.render('Attempts: {}'.format(self.attempts), False, BLACK)
+        score = font.render('Score: {}'.format(self.score), False, BLACK)
+        attempts = font.render('Attempts: {}'.format(self.attempts), False, BLACK)
         total_seconds = TIME_LIMIT - int((pg.time.get_ticks() - self.start_ticks) / 1000)
         minutes = int(total_seconds / 60)
         seconds = total_seconds % 60
@@ -71,8 +67,8 @@ class Game:
             time = font.render('{}:{} Left'.format(minutes, seconds), False, BLACK)
         self.screen.fill(WHITE)
         self.screen.blit(self.bkgrd, (0, 0))
-        self.screen.blit(score1, (5, 10))
-        self.screen.blit(score2, (5, 40))
+        self.screen.blit(score, (5, 10))
+        self.screen.blit(attempts, (5, 40))
         self.screen.blit(time, (500, 10))
         self.all_sprites.draw(self.screen)
         pg.draw.line(self.screen, LINE_COLOUR,
@@ -87,14 +83,9 @@ class Game:
     def show_start_screen(self):
         self.start = Start()
         self.start.run()
-        # self.show_waiting()
 
     def show_over_screen(self):
         pass
-
-    def show_waiting(self):
-        self.wait = Wait()
-        self.wait.run()
 
 
 def main():
