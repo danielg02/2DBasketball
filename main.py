@@ -2,13 +2,16 @@ import pygame as pg
 from ball import Ball
 from net import Net
 from settings import *
-import start
+from start import Start
+from obstacles import Obstacle
+from network import Network
+from wait import Wait
 
 # TODO:
-# Settings screen
-# Moving Background and Obstacles
+# Obstacle Collision
 # Game Over Screen
-# Multiple Levels
+# Reset game/server
+# Wait for game
 
 
 class Game:
@@ -20,13 +23,18 @@ class Game:
         pg.display.set_caption(TITLE)
         self.clock = pg.time.Clock()
         self.running = True
-        self.score = 0
+        self.score1 = 0
+        self.score2 = 0
+        self.attempts = 0
 
     def new_game(self):
         self.all_sprites = pg.sprite.Group()
         self.net = Net(game)
+        self.obstacle = Obstacle(game)
         self.ball = Ball(game)
-        self.all_sprites.add(self.ball, self.net)
+        self.network = Network()
+        self.all_sprites.add(self.ball, self.net, self.obstacle)
+        self.start_ticks = pg.time.get_ticks()
         self.run()
 
     def run(self):
@@ -47,19 +55,46 @@ class Game:
                 self.running = False
             elif event.type == pg.MOUSEBUTTONUP:
                 self.ball.new_shot()
+        self.score2 = str(self.network.send(str(self.score1)))
 
     def draw(self):
+        font = pg.font.Font('Fonts/212 Sports.otf', 30)
+        score1 = font.render('Score: {}'.format(self.score1), False, BLACK)
+        score2 = font.render('Score: {}'.format(self.score2), False, BLACK)
+        # attempts = font.render('Attempts: {}'.format(self.attempts), False, BLACK)
+        total_seconds = TIME_LIMIT - int((pg.time.get_ticks() - self.start_ticks) / 1000)
+        minutes = int(total_seconds / 60)
+        seconds = total_seconds % 60
+        if seconds < 10:
+            time = font.render('{}:0{} Left'.format(minutes, seconds), False, BLACK)
+        else:
+            time = font.render('{}:{} Left'.format(minutes, seconds), False, BLACK)
         self.screen.fill(WHITE)
         self.screen.blit(self.bkgrd, (0, 0))
+        self.screen.blit(score1, (5, 10))
+        self.screen.blit(score2, (5, 40))
+        self.screen.blit(time, (500, 10))
         self.all_sprites.draw(self.screen)
-        pg.draw.line(self.screen, LINE_COLOUR, self.ball.line[0], self.ball.line[1])
+        pg.draw.line(self.screen, LINE_COLOUR,
+                     self.ball.line[0], self.ball.line[1])
         pg.display.flip()
 
+        if total_seconds <= 0:
+            self.playing = False
+            self.show_over_screen()
+            self.show_start_screen()
+
     def show_start_screen(self):
-        start.run()
+        self.start = Start()
+        self.start.run()
+        # self.show_waiting()
 
     def show_over_screen(self):
         pass
+
+    def show_waiting(self):
+        self.wait = Wait()
+        self.wait.run()
 
 
 def main():
