@@ -8,10 +8,11 @@ from network import Network
 from wait import Wait
 
 # TODO:
+# Fix net collision (make it easier to score)
 # Obstacle Collision
 # Game Over Screen
 # Reset game/server
-# Wait for game
+# Make solo mode with mysql db for highscores
 
 
 class Game:
@@ -24,7 +25,6 @@ class Game:
         self.clock = pg.time.Clock()
         self.running = True
         self.score1 = 0
-        self.score2 = 0
         self.attempts = 0
 
     def new_game(self):
@@ -33,6 +33,8 @@ class Game:
         self.obstacle = Obstacle(game)
         self.ball = Ball(game)
         self.network = Network()
+        self.data1 = self.network.getData()
+        print(self.data1.num_of_players)
         self.all_sprites.add(self.ball, self.net, self.obstacle)
         self.start_ticks = pg.time.get_ticks()
         self.run()
@@ -55,46 +57,47 @@ class Game:
                 self.running = False
             elif event.type == pg.MOUSEBUTTONUP:
                 self.ball.new_shot()
-        self.score2 = str(self.network.send(str(self.score1)))
+        self.data1.score = self.score1
+        self.data2 = self.network.send(self.data1)
 
     def draw(self):
-        font = pg.font.Font('Fonts/212 Sports.otf', 30)
-        score1 = font.render('Score: {}'.format(self.score1), False, BLACK)
-        score2 = font.render('Score: {}'.format(self.score2), False, BLACK)
-        # attempts = font.render('Attempts: {}'.format(self.attempts), False, BLACK)
-        total_seconds = TIME_LIMIT - int((pg.time.get_ticks() - self.start_ticks) / 1000)
-        minutes = int(total_seconds / 60)
-        seconds = total_seconds % 60
-        if seconds < 10:
-            time = font.render('{}:0{} Left'.format(minutes, seconds), False, BLACK)
-        else:
-            time = font.render('{}:{} Left'.format(minutes, seconds), False, BLACK)
-        self.screen.fill(WHITE)
-        self.screen.blit(self.bkgrd, (0, 0))
-        self.screen.blit(score1, (5, 10))
-        self.screen.blit(score2, (5, 40))
-        self.screen.blit(time, (500, 10))
-        self.all_sprites.draw(self.screen)
-        pg.draw.line(self.screen, LINE_COLOUR,
-                     self.ball.line[0], self.ball.line[1])
-        pg.display.flip()
+        if self.data2.num_of_players < 2 and self.data2.num_of_players < 2: 
+            self.wait.run()
 
-        if total_seconds <= 0:
-            self.playing = False
-            self.show_over_screen()
-            self.show_start_screen()
+        else:
+            self.data1.num_of_players = 2
+            font = pg.font.Font('Fonts/212 Sports.otf', 30)
+            score1 = font.render('Your Score: {}'.format(self.data1.score), False, BLACK)
+            score2 = font.render('Opp. Score: {}'.format(self.data2.score), False, BLACK)
+            total_seconds = TIME_LIMIT - int((pg.time.get_ticks() - self.start_ticks) / 1000)
+            minutes = int(total_seconds / 60)
+            seconds = total_seconds % 60
+            if seconds < 10:
+                time = font.render('{}:0{} Left'.format(minutes, seconds), False, BLACK)
+            else:
+                time = font.render('{}:{} Left'.format(minutes, seconds), False, BLACK)
+            self.screen.fill(WHITE)
+            self.screen.blit(self.bkgrd, (0, 0))
+            self.screen.blit(score1, (5, 10))
+            self.screen.blit(score2, (5, 40))
+            self.screen.blit(time, (500, 10))
+            self.all_sprites.draw(self.screen)
+            pg.draw.line(self.screen, LINE_COLOUR,
+                        self.ball.line[0], self.ball.line[1])
+            pg.display.flip()
+
+            if total_seconds <= 0:
+                self.playing = False
+                self.show_over_screen()
+                self.show_start_screen()
 
     def show_start_screen(self):
         self.start = Start()
+        self.wait = Wait()
         self.start.run()
-        # self.show_waiting()
 
     def show_over_screen(self):
         pass
-
-    def show_waiting(self):
-        self.wait = Wait()
-        self.wait.run()
 
 
 def main():

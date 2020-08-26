@@ -16,13 +16,11 @@ class Wait:
     def __init__(self):
         pass
 
-
     def run(self):
-        while True:
-            screen.fill(WHITE)
-            screen.blit(waiting, (WIDTH/2-(waiting.get_width()/2), HEIGHT/2-waiting.get_height()))
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    pg.quit()
+        screen.fill(WHITE)
+        screen.blit(waiting, (WIDTH/2-(waiting.get_width()/2), HEIGHT/2-waiting.get_height()))
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
 
-            pg.display.flip()
+        pg.display.flip()
