@@ -1,5 +1,3 @@
 ## Welcome to SimpliFit: An Android Fitness Application
 
-You can view the code for this poject by clicking the **View on GitHub** button above. The app was created using Android Studio and was programmed in Java.
-The purpose of the project was to create an app that makes it easier for users to organize their workouts as well as to familiarize myself with Android 
-development and the software development process.
+You can view the code for this project by clicking the **View on GitHub** button above. The project is a 2D physics-based basketball game made using Python's Pygame library. I implemented a multithreaded socket server that allows for clients to connect to and face each other and created a MySQL database that keeps track of personal high scores.
